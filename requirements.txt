@@ -1,0 +1,11 @@
+pandas
+numpy
+matplotlib
+scikit-learn
+seaborn
+requests
+kagglehub
+xarray
+h5netcdf
+h5py
+cftime

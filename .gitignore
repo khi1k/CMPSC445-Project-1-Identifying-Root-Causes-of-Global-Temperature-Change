@@ -1,0 +1,46 @@
+#Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+#Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+
+#IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+#Raw Data (too large)
+data/raw/*.csv
+data/raw/*.nc
+
+#Processed Data (except final dataset)
+data/processed/*.csv
+!data/processed/final_climate_dataset.csv
+
+#Results
+results/*.png
+results/*.txt
+results/*.csv
+
+#Kaggle credentials
+.kaggle/
+kaggle.json
+
+#OS files
+.DS_Store
+Thumbs.db
+
+#Logs
+*.log
