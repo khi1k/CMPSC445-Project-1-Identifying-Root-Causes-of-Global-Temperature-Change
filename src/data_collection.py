@@ -71,9 +71,9 @@ def load_noaa_all():
     data_frames = []
     #files and the number of rows we skip at the top of each dataset
     files = [
-        ('co2', rawdata_directory / "noaa_co2_monthly.csv", 72),
-        ('ch4', rawdata_directory / "noaa_ch4_monthly.csv", 69),
-        ('n2o', rawdata_directory / "noaa_n2o_monthly.csv", 69)
+        ('co2', rawdata_directory / "noaa_co2_monthly.csv", 39),
+        ('ch4', rawdata_directory / "noaa_ch4_monthly.csv", 46),
+        ('n2o', rawdata_directory / "noaa_n2o_monthly.csv", 46)
     ]
     for gas_name, filepath, skip in files:
         if filepath.exists():

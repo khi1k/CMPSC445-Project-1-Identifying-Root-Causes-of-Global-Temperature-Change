@@ -153,24 +153,24 @@ def create_features(df):
     df["years_since_1979"] = df["date"].dt.year - 1979
 
     #growth rates for greenhouse gases
-    if "co2_x" in df.columns:
-        df["co2_growth_rate"] = df["co2_x"].diff()
+    if "co2_Noaa" in df.columns:
+        df["co2_growth_rate"] = df["co2_Noaa"].diff()
     if "ch4" in df.columns:
         df["ch4_growth_rate"] = df["ch4"].diff()
     if "n2o" in df.columns:
         df["n2o_growth_rate"] = df["n2o"].diff()
 
     #lagged greenhouse gas features
-    if "co2_x" in df.columns:
-        df["co2_lag1"] = df["co2_x"].shift(12)
+    if "co2_Noaa" in df.columns:
+        df["co2_lag1"] = df["co2_Noaa"].shift(12)
     if "ch4" in df.columns:
         df["ch4_lag1"] = df["ch4"].shift(12)
     if "n2o" in df.columns:
         df["n2o_lag1"] = df["n2o"].shift(12)
 
     #12 month moving averages
-    if "co2_x" in df.columns:
-        df["co2_ma12"] = df["co2_x"].rolling(12).mean()
+    if "co2_Noaa" in df.columns:
+        df["co2_ma12"] = df["co2_Noaa"].rolling(12).mean()
     if "ch4" in df.columns:
         df["ch4_ma12"] = df["ch4"].rolling(12).mean()
     if "n2o" in df.columns:

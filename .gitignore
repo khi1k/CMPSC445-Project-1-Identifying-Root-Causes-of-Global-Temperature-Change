@@ -29,10 +29,6 @@ data/raw/*.nc
 data/processed/*.csv
 !data/processed/final_climate_dataset.csv
 
-#Results
-results/*.png
-results/*.txt
-results/*.csv
 
 #Kaggle credentials
 .kaggle/

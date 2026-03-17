@@ -79,7 +79,7 @@ def check_requirements():
 
 #running the full analysis of the dataset
 def main():
-    print("\nClimate Route Cause Analysis:")
+    print("\nClimate Root Cause Analysis:")
     print("Identifying drivers of global temperature change")
 
     #check requirements first

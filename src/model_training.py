@@ -7,6 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import matplotlib.pyplot as plt
 import seaborn as sns
+import xgboost as xgb
 
 #setup paths
 processeddata_directory = Path("data/processed")
@@ -26,7 +27,7 @@ def load_data():
 def prepare_data(df, target_col="temperature_change_from_ghg"):
     print("\nPreparing features and target")
     #drop non-feature columns
-    drop_cols = ["date", "year", target_col]
+    drop_cols = ["date", "year", target_col, "years_since_1979"]
     if "co2_x" in df.columns:
         drop_cols.append("co2_x")
     if "co2_y" in df.columns:
@@ -53,6 +54,8 @@ def train_models(X, y):
     #split data
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42, shuffle=False)
+    print(f"Target range - Train: [{y_train.min():.3f}, {y_train.max():.3f}]")
+    print(f"Target range - Test: [{y_test.min():.3f}, {y_test.max():.3f}]")
     print(f"Train size: {len(X_train)} rows")
     print(f"Test size: {len(X_test)} rows")
     print("\nTesting different max_depth values:")
@@ -93,7 +96,7 @@ def train_models(X, y):
 
     #2.Random Forest Regressor Model creation
     print("\nRandom Forest Regressor")
-    rf = RandomForestRegressor(n_estimators=150, max_depth=8, min_samples_split=10, min_samples_leaf=2, max_features=0.5, random_state=42, n_jobs=-1)
+    rf = RandomForestRegressor(n_estimators=100, max_depth=5, min_samples_split=5, min_samples_leaf=2, max_features=0.5, random_state=42, n_jobs=-1)
     rf.fit(X_train, y_train)
     y_pred_rf = rf.predict(X_test)
     mse_rf = mean_squared_error(y_test, y_pred_rf)
@@ -107,17 +110,50 @@ def train_models(X, y):
     print(f"MSE: {mse_rf:.4f}")
     print(f"R2: {r2_rf:.4f}")
 
+    #3. XGBoost Regressor
+    print("\nXGBoost Regressor")
+
+    xgb_model = xgb.XGBRegressor(
+        n_estimators=100,
+        max_depth=3,
+        learning_rate=0.05,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        random_state=42,
+        n_jobs=-1)
+    xgb_model.fit(X_train, y_train)
+    y_pred_xgb = xgb_model.predict(X_test)
+    mse_xgb = mean_squared_error(y_test, y_pred_xgb)
+    r2_xgb = r2_score(y_test, y_pred_xgb)
+    results["XGBoost"] = {
+        "model": xgb_model,
+        "mse": mse_xgb,
+        "r2": r2_xgb,
+        "predictions": y_pred_xgb,
+        "actual": y_test.values
+    }
+    print(f"MSE: {mse_xgb:.4f}")
+    print(f"R2: {r2_xgb:.4f}")
+
+    #feature importance for XGBoost
+    xgb_importance = pd.DataFrame({
+        "feature": X.columns,
+        "importance": xgb_model.feature_importances_
+    }).sort_values("importance", ascending=False)
+    print("\nTop 10 most important features - XGBoost:")
+    print(xgb_importance.head(10).to_string(index=False))
+
     #feature importance
     importance_df = pd.DataFrame({
         "feature": X.columns,
         "importance": rf.feature_importances_
     }).sort_values("importance", ascending=False)
-    print("\nTop 10 most important features:")
+    print("\nTop 10 most important features - Random Forest:")
     print(importance_df.head(10).to_string(index=False))
     return results, X_test.index, y_test
 
 #create feature importance plots
-def plot_feature_importance(results, feature_names, X_test_index, y_test, X):
+def plot_feature_importance(results, feature_names, y_test, X):
     print("\nGenerating Plots - ")
     plt.figure(figsize=(10, 8))
     sns.heatmap(X.corr(), cmap="coolwarm", center=0)
@@ -165,6 +201,9 @@ def plot_feature_importance(results, feature_names, X_test_index, y_test, X):
              label="Linear Regression", linestyle="--", alpha=0.7)
     plt.plot(y_test.index, results["Random Forest"]["predictions"],
              label="Random Forest", linestyle="--", alpha=0.7)
+
+    plt.plot(y_test.index, results["XGBoost"]["predictions"],
+             label="XGBoost", linestyle="--", alpha=0.7)
     plt.xlabel("Time Index")
     plt.ylabel("Temperature Anomaly")
     plt.title("Model Predictions vs Actual")
@@ -213,7 +252,7 @@ def run_modeling():
     results, test_idx, y_test = train_models(X, y)
     #plot results
     coef_df, importance_df = plot_feature_importance(
-        results, feature_names, test_idx, y_test, X)
+        results, feature_names, y_test, X)
     #discuss findings
     discuss_root_causes(coef_df, importance_df)
 

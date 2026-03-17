@@ -1,0 +1,49 @@
+Model Performance Summary
+Linear Regression:
+  MSE: 0.0024
+  R2:  0.7207
+
+Random Forest:
+  MSE: 0.0407
+  R2:  -3.6733
+
+XGBoost:
+  MSE: 0.0391
+  R2:  -3.4917
+
+
+Feature Importance of Random Forest:
+             feature  importance
+6      nitrous_oxide    0.345886
+4           co2_Owid    0.302412
+0           co2_Noaa    0.140453
+5            methane    0.118676
+14          co2_ma12    0.034689
+2                n2o    0.017563
+15          ch4_ma12    0.012088
+16          n2o_ma12    0.009283
+7   solar_irradiance    0.006172
+12          ch4_lag1    0.004603
+11          co2_lag1    0.003446
+1                ch4    0.002951
+13          n2o_lag1    0.001767
+3       temp_anomaly    0.000012
+9    ch4_growth_rate    0.000000
+
+Linear Regression Coefficients:
+            feature  coefficient
+10  n2o_growth_rate     0.036495
+0          co2_Noaa     0.010891
+9   ch4_growth_rate     0.002523
+14         co2_ma12     0.001493
+16         n2o_ma12     0.001057
+6     nitrous_oxide     0.000063
+1               ch4     0.000055
+5           methane     0.000043
+12         ch4_lag1     0.000026
+15         ch4_ma12    -0.000008
+4          co2_Owid    -0.000009
+13         n2o_lag1    -0.000083
+2               n2o    -0.001059
+11         co2_lag1    -0.001343
+3      temp_anomaly    -0.002288
