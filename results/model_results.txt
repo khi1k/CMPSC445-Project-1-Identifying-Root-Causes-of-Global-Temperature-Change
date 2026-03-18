@@ -1,7 +1,7 @@
 Model Performance Summary
 Linear Regression:
   MSE: 0.0024
-  R2:  0.7207
+  R2:  0.7230
 
 Random Forest:
   MSE: 0.0407
@@ -32,18 +32,18 @@ Feature Importance of Random Forest:
 
 Linear Regression Coefficients:
             feature  coefficient
-10  n2o_growth_rate     0.036495
+10  n2o_growth_rate     0.036514
 0          co2_Noaa     0.010891
 9   ch4_growth_rate     0.002523
 14         co2_ma12     0.001493
-16         n2o_ma12     0.001057
+16         n2o_ma12     0.001058
 6     nitrous_oxide     0.000063
 1               ch4     0.000055
 5           methane     0.000043
 12         ch4_lag1     0.000026
 15         ch4_ma12    -0.000008
 4          co2_Owid    -0.000009
-13         n2o_lag1    -0.000083
+13         n2o_lag1    -0.000085
 2               n2o    -0.001059
 11         co2_lag1    -0.001343
-3      temp_anomaly    -0.002288
+3      temp_anomaly    -0.002327

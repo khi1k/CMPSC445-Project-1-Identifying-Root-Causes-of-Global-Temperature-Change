@@ -22,8 +22,8 @@ ENV/
 *~
 
 #Raw Data (too large)
-data/raw/*.csv
-data/raw/*.nc
+#data/raw/*.csv
+#data/raw/*.nc
 
 #Processed Data (except final dataset)
 data/processed/*.csv

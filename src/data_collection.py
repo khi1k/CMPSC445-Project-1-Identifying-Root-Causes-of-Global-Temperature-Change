@@ -93,7 +93,30 @@ def load_noaa_all():
         return merged
     return pd.DataFrame()
 
-#this function downloads the NASA temperature data from Kaggle
+#Downloads the official NASA GISS surface dataset for use, it finally started to work again a day later lol, so id prefer to
+#use this one over the kaggle dataset
+def download_nasa_giss_data():
+    print("Downloading the official NASA GISS Globaltemperature data")
+    url = "https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv"
+    save_path = rawdata_directory / "nasa_giss_monthly.csv"
+    try:
+        response = requests.get(url, timeout=30)
+        response.raise_for_status()
+        with open(save_path, 'wb') as f:
+            f.write(response.content)
+        print(f"Official NASA data saved -> {save_path.name}")
+        return True
+    except Exception as e:
+        print(f"Official NASA data download failed: {e}")
+        print("You can manually download it from:")
+        print(url)
+        print(f"and save it as: {save_path}")
+        return False
+
+
+#this function downloads the NASA temperature data from Kaggle, fallback if the original nasa data doesnt load
+#Was having issues with original nasa link and csv/txt downloads not working, so i used this method instead
+#its workin now, so im gonna use this as a fallback
 def download_nasa_data():
     print("Downloading NASA temperature data from Kaggle")
     try:
@@ -251,7 +274,8 @@ def download_all_data():
     download_noaa_data()
     download_owid_data()
     download_solar_data()
-    download_nasa_data()
+    download_nasa_data() #kaggle nasa dataset
+    download_nasa_giss_data() #original nasa dataset
     print("All downloads finished")
 
 #this function loads all datasets and stores them in a dictionary

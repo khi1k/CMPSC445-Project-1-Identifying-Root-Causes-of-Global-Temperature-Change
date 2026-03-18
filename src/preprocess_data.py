@@ -94,6 +94,43 @@ def load_nasa_temps():
 
     return result
 
+#Loads the official NASA GISS temperature data
+def load_nasa_giss_data():
+    print("Loading official NASA GISS temperature data")
+    filepath = rawdata_directory / "nasa_giss_monthly.csv"
+    if not filepath.exists():
+        print("Official NASA GISS data not found, Please run data collection first")
+        return pd.DataFrame()
+    try:
+        # Skips the first row which contains the description of dataset
+        df = pd.read_csv(filepath, skiprows=1)
+        #Used same logic as the other load nasa function
+        df_melted = df.melt(id_vars=['Year'], var_name='month', value_name='temp_anomaly')
+        month_map = {
+            'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'Jun': 6,
+            'Jul': 7, 'Aug': 8, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12
+        }
+        df_melted['month_num'] = df_melted['month'].map(month_map)
+        df_melted = df_melted.dropna(subset=['month_num'])
+        df_melted['month_num'] = df_melted['month_num'].astype(int)
+        df_melted['date'] = pd.to_datetime(
+            df_melted['Year'].astype(int).astype(str) + '-' +
+            df_melted['month_num'].astype(str).str.zfill(2) + '-01')
+        # Filter out rows with *** (missing data)
+        df_melted = df_melted[df_melted['temp_anomaly'] != '***']
+        df_melted['temp_anomaly'] = pd.to_numeric(df_melted['temp_anomaly'])
+        result = df_melted[['date', 'temp_anomaly']].dropna().sort_values('date')
+        print(
+            f"Loaded official NASA data: {len(result)} total months months from {result['date'].min().year} to {result['date'].max().year}")
+        # Save processed version
+        nasa_path = processeddata_directory / "nasa_giss_processed.csv"
+        result.to_csv(nasa_path, index=False)
+        print(f"Saved the processed NASA data to: {nasa_path}")
+        return result
+    except Exception as e:
+        print(f"Error loading official NASA GISS dataset: {e}")
+        return pd.DataFrame()
+
 #this function cleans the OWID dataset and filters to global values
 def preprocess_owid():
     print("Processing OWID dataset")
@@ -122,11 +159,20 @@ def preprocess_owid():
     return df
 
 #this function merges the climate datasets together
-def merge_datasets():
+def merge_datasets(use_official_nasa=True):
     noaa = preprocess_noaa_all()
     owid = preprocess_owid()
-    nasa = load_nasa_temps()
+    #nasa = load_nasa_temps()
     solar = load_solar_data()
+
+    #Funtion that chooses which NASA dataset to use depending on if the original is working or not
+    if use_official_nasa:
+        nasa = load_nasa_giss_data()
+        if nasa.empty:
+            print("Official NASA data failed to load, falling back to Kaggle version.")
+            nasa = load_nasa_temps()
+    else:
+        nasa = load_nasa_temps()
 
     #start with NOAA as the base dataset then merge and format the others
     merged = noaa
@@ -181,8 +227,8 @@ def create_features(df):
     print(f"Rows after feature engineering: {len(df)}")
     return df
 
-def build_final_dataset():
-    merged = merge_datasets()
+def build_final_dataset(use_official_nasa=True):
+    merged = merge_datasets(use_official_nasa = use_official_nasa)
     final_df = create_features(merged)
     print("Final dataset preview:")
     print(final_df.head(10))  #show more rows to see what's happening
