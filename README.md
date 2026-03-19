@@ -51,6 +51,8 @@ linear_coefficients.png: Linear regression coefficient plot
 rf_importance.png: Random Forest feature importance
 predictions_comparison.png: Model predictions vs actual comparing
 correlation_matrix.png: Feature correlation heatmap
+scatter_top_feature.png: scatter plot with a regression line, showing relationship between CO₂ and global temp change
+timeseries_trends.png: A three-part time series plot showing CO₂, CH₄, and N₂O trends alongside global temperature anomalies from 1980-2025
 model_results.txt: Performance metrics and feature rankings
 
 ## Key Findings - 

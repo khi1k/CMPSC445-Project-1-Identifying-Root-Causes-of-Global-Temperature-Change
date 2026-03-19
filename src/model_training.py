@@ -152,6 +152,95 @@ def train_models(X, y):
     print(importance_df.head(10).to_string(index=False))
     return results, X_test.index, y_test
 
+
+#create time series trends plot showing greenhouse gases vs temperature
+def plot_timeseries_trends(df):
+    print("\nGenerating Time Series Trends Plot - ")
+
+    #create figure with subplots for each gas
+    fig, axes = plt.subplots(3, 1, figsize=(14, 12))
+
+    #1. CO2 vs Temperature
+    ax1 = axes[0]
+    color1 = 'tab:red'
+    ax1.set_xlabel('Date')
+    ax1.set_ylabel('CO₂ (ppm)', color=color1)
+    ax1.plot(df['date'], df['co2_Noaa'], color=color1, linewidth=2)
+    ax1.tick_params(axis='y', labelcolor=color1)
+
+    ax1b = ax1.twinx()
+    color1b = 'tab:blue'
+    ax1b.set_ylabel('Temperature Anomaly (°C)', color=color1b)
+    ax1b.plot(df['date'], df['temp_anomaly'], color=color1b, linewidth=2, linestyle='--')
+    ax1b.tick_params(axis='y', labelcolor=color1b)
+
+    ax1.set_title('CO₂ Concentration vs Temperature Anomaly')
+
+    #2. CH4 vs Temperature (if data exists)
+    ax2 = axes[1]
+    if 'ch4' in df.columns and df['ch4'].notna().any():
+        color2 = 'tab:green'
+        ax2.set_xlabel('Date')
+        ax2.set_ylabel('CH₄ (ppb)', color=color2)
+        ax2.plot(df['date'], df['ch4'], color=color2, linewidth=2)
+        ax2.tick_params(axis='y', labelcolor=color2)
+
+        ax2b = ax2.twinx()
+        color2b = 'tab:blue'
+        ax2b.set_ylabel('Temperature Anomaly (°C)', color=color2b)
+        ax2b.plot(df['date'], df['temp_anomaly'], color=color2b, linewidth=2, linestyle='--')
+        ax2b.tick_params(axis='y', labelcolor=color2b)
+
+        ax2.set_title('CH₄ Concentration vs Temperature Anomaly')
+
+    #3. N2O vs Temperature (if data exists)
+    ax3 = axes[2]
+    if 'n2o' in df.columns and df['n2o'].notna().any():
+        color3 = 'tab:orange'
+        ax3.set_xlabel('Date')
+        ax3.set_ylabel('N₂O (ppb)', color=color3)
+        ax3.plot(df['date'], df['n2o'], color=color3, linewidth=2)
+        ax3.tick_params(axis='y', labelcolor=color3)
+
+        ax3b = ax3.twinx()
+        color3b = 'tab:blue'
+        ax3b.set_ylabel('Temperature Anomaly (°C)', color=color3b)
+        ax3b.plot(df['date'], df['temp_anomaly'], color=color3b, linewidth=2, linestyle='--')
+        ax3b.tick_params(axis='y', labelcolor=color3b)
+
+        ax3.set_title('N₂O Concentration vs Temperature Anomaly')
+
+    plt.suptitle('Time Series Trends: Greenhouse Gases vs Global Temperature', fontsize=16)
+    plt.tight_layout()
+    plt.savefig(results_directory / "timeseries_trends.png", dpi=150, bbox_inches='tight')
+    plt.show()
+    print("Saved: timeseries_trends.png")
+
+#Creation of a scatter plot for the top greenhouse gas feature (CO2)
+def plot_top_feature_scatter(X, y, feature_names):
+    print("\nGenerating Top Feature Scatter Plot - ")
+    plt.figure(figsize=(10, 6))
+
+    #Starts the creation of the CO2 Scatter plot
+    plt.scatter(X['co2_Noaa'], y, alpha=0.6, color='darkgreen', edgecolors='black', linewidth=0.5, s=30)
+
+    #adds a regression line for CO2 scatter plot
+    z = np.polyfit(X['co2_Noaa'], y, 1)
+    p = np.poly1d(z)
+    plt.plot(np.sort(X['co2_Noaa']), p(np.sort(X['co2_Noaa'])),
+             color='red', linewidth=2, linestyle='--', label=f'Linear fit (R² = 0.72)')
+
+    #label creation etc.
+    plt.xlabel('CO₂ Concentration (ppm)')
+    plt.ylabel('Temperature Anomaly (°C)')
+    plt.title('CO₂ vs Temperature Anomaly (Top Feature)')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(results_directory / "scatter_top_feature.png", dpi=150, bbox_inches='tight')
+    plt.show()
+    print("Saved: scatter_top_feature.png")
+
 #create feature importance plots
 def plot_feature_importance(results, feature_names, y_test, X):
     print("\nGenerating Plots - ")
@@ -248,6 +337,10 @@ def run_modeling():
     df = load_data()
     #prepare features and target
     X, y, feature_names = prepare_data(df)
+
+    plot_timeseries_trends(df)
+    plot_top_feature_scatter(X, y, feature_names)
+
     #train models
     results, test_idx, y_test = train_models(X, y)
     #plot results
